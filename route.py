@@ -41,12 +41,16 @@ def action_portal():
     username = request.forms.get('username')
     password = request.forms.get('password')
     auth_result = ctl.authenticate_user(username, password)
-    if auth_result is not None:  
+    
+    if auth_result is not None:
         session_id, username = auth_result
         response.set_cookie('session_id', session_id, httponly=True, secure=True, max_age=3600)
-        redirect(f'/pagina/{username}')
+        return redirect(f'/pagina/{username}')
     else:
+        # Define um cookie de erro e redireciona de volta
+        response.set_cookie('auth_error', 'Usuario ou senha invalidos', max_age=10)  # Cookie expira rapidamente
         return redirect('/portal')
+
     
 @app.route('/logout', method='POST')
 def logout():
