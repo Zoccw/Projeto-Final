@@ -1,0 +1,112 @@
+/* Corpo da página */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Contêiner do formulário */
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Estilo do título */
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Estilo dos labels */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Estilo dos campos de input */
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box; /* Para garantir que o padding não afete a largura do campo */
+}
+
+/* Estilo do botão de login */
+input[type="submit"], button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Efeito de hover nos botões */
+input[type="submit"]:hover, button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo do botão de logout */
+button {
+    background-color: #dc3545;
+}
+
+button:hover {
+    background-color: #c82333;
+}
+
+/* Estilo dos grupos de campos do formulário */
+.form-group {
+    margin-bottom: 16px;
+}
+
+/* Botão de mostrar senha */
+button[type="button"] {
+    background-color: #f1f1f1;
+    color: #007BFF;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 8px;
+    width: auto; /* O botão "Mostrar Senha" deve se ajustar ao conteúdo */
+}
+
+/* Efeito de hover no botão "Mostrar Senha" */
+button[type="button"]:hover {
+    background-color: #e0e0e0;
+    transition: background-color 0.3s ease;
+}
+
+/* Estilo para a área de exibição de erro */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid red;
+    background-color: #f8d7da;
+    border-radius: 5px;
+    text-align: center;
+    display: none; /* Oculta por padrão */
+}
