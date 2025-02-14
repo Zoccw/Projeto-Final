@@ -1,4 +1,5 @@
 import uuid
+#################################################################################################
 class usuario:
     def __init__(self, nome, email, telefone):
         self.__id = uuid.uuid4()
@@ -8,6 +9,8 @@ class usuario:
         self.avaliacao = 5.0
         self.notas = []
         self.comentarios = []
+        #Iniciar anuncio 
+        self.anuncio = anuncio()
         
     def get_id(self):
         return self.__id
@@ -16,31 +19,27 @@ class usuario:
         self.nome = nome
         self.email = email
         self.telefone = telefone
-
-    def adicionar_produto(self, produto):
-        self.produtos.append(produto)
         
     def calcular_avaliacao_media(self):
         if self.notas:
             self.avaliacao = sum(self.notas) / len(self.notas)
         else:
             self.avaliacao = 5.0 
-        
-class produto:
-    def __init__(self, nome, preco, descricao, quantidade, categoria):
-        self.nome = nome
-        self.preco = preco
-        self.descricao = descricao
-        self.categoria = categoria
-        self.quantidade = quantidade
-
-    def atualizar_produto(self, nome, preco, descricao, quantidade, categoria):
-        self.nome = nome
-        self.preco = preco
-        self.categoria = categoria
-        self.descricao = descricao
-        self.quantidade = quantidade
-
+    
+    #métodos da classe anuncio
+    def criar_anuncio(self, nome, descricao, preco, estado, categoria, fotos):
+        return self.anuncio.criar_anuncio(nome, descricao, preco, estado, categoria, fotos)
+    
+    def ver_anuncio(self):
+        return self.anuncio.ver_anuncio()
+    
+    def editar_anuncio(self, anuncio_nome, **kwargs):
+        return self.anuncio.editar_anuncio(anuncio_nome, **kwargs)
+    
+    def remover_anuncio(self, anuncio_nome):
+        return self.anuncio.remover_anuncio(anuncio_nome)
+#################################################################################################
+#################################################################################################
 class avaliacao:
     def __init__(self, avaliador, avaliado, nota, comentario):
         if not self.validar_nota_comentario(nota, comentario):
@@ -60,23 +59,54 @@ class avaliacao:
         if not comentario:
             raise ValueError("Comentário inválido. O comentário não pode estar vazio.")
         return True
-
-class comprador(usuario):
-    def __init__(self):
-        self.historico_compras = []
-        self.itens_favoritos = []
-
+#################################################################################################
+class produto:
+    def __init__(self, nome, descricao, preco, estado, categoria, fotos):
+        self.nome = nome
+        self.descricao = descricao
+        self.preco = preco
+        self.estado = estado
+        self.categoria = categoria
+        self.fotos = fotos   
 ##Criar método para fazer perguntas
 ##Criar método para adicionar produto aos favoritos
 ##Criar método para confirmar recebimento e registrar em historico de compras e historico de vendas
 ##Passar avaliação da classe usuario para a classe comprador
-
-class vendedor(usuario):
+#################################################################################################
+class anuncio:
     def __init__(self):
-        self.lista_produtos = []
-        self.historico_vendas = []
+        self.itens_anunciados = []
+        
+    def criar_anuncio(self, nome, descricao, preco, estado, categoria, fotos):
+        anuncio = produto(nome = nome, descricao = descricao, preco = preco, estado = estado, categoria = categoria, fotos = fotos)
+        self.itens_anunciados.append(anuncio)
+    
+    def ver_anuncio(self):
+        if not self.itens_anunciados:
+            print("Nenhum anúncio disponível.")
+            return
+        for item in self.itens_anunciados:
+            print(f"Produto: {item.nome}, Preço: {item.preco}, Descrição: {item.descricao}, Categoria: {item.categoria}, Estado: {item.estado}")
+    
+    def editar_anuncio(self, anuncio_nome, **kwargs):
+        for anuncio in self.itens_anunciados:
+            if anuncio.nome == anuncio_nome:
+                for key, value in kwargs.items():
+                    if hasattr(anuncio, key):
+                        setattr(anuncio, key, value)
 
+    def remover_anuncio(self, anuncio_nome):
+        for anuncio in self.itens_anunciados:
+            if anuncio.nome == anuncio_nome:
+                self.itens_anunciados.remove(anuncio)
+#################################################################################################
 ##Criar método para adicionar produto a venda
 ##Criar método para remover produto da venda
 ##Criar método para registrar envio
-##Criar método para responder perguntas
+usuario1 = usuario("João", "joaonaruto@gmail.com", "999999999")
+
+usuario1.criar_anuncio("MacBook Pro 2019", "MacBook em ótimo estado", 5000, "novo", "eletrônicos", ["foto1", "foto2", "foto3"])
+usuario1.criar_anuncio("controle", "para controlar", 50, "usado", "eletronicos", ["foto1", "foto2", "foto3"])
+usuario1.ver_anuncio()
+usuario1.remover_anuncio("controle")
+usuario1.ver_anuncio()
