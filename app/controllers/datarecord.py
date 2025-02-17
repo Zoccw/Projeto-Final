@@ -1,5 +1,10 @@
 from app.models.user_account import UserAccount, SuperAccount
 from app.models.user_message import UserMessage
+from app.models.anuncio import Anuncio
+from app.models.categoria import categoria
+from app.models.comprador import comprador
+from app.models.vendedor import vendedor
+from app.models.mensagem import mensagem
 import json
 import uuid
 
@@ -138,3 +143,57 @@ class UserRecord():
     def logout(self, session_id):
         if session_id in self.__authenticated_users:
             del self.__authenticated_users[session_id] # Remove o usuário logado
+
+# ------------------------------------------------------------------------------
+
+class AnuncioRecord():
+    
+    def __init__(self):
+        self.__storeanuncios = []
+        self.read()
+    
+    def read(self):
+        try:
+            with open("app/controllers/db/anuncios.json", "r") as fjson:
+                anuncios = json.load(fjson)
+                self.__storeanuncios = [Anuncio(**anuncio) for anuncio in anuncios]
+        except FileNotFoundError:
+            print('Não existem anúncios registrados')
+            
+    def __write(self):
+        try:
+            with open("app/controllers/db/anuncios.json", "w") as fjson:
+                anuncios = [vars(anuncio) for anuncio in self.__storeanuncios]
+                json.dump(anuncios, fjson, indent=4)
+                print('Arquivo gravado com sucesso (Anúncio)!')
+        except FileNotFoundError:
+            print('O sistema não conseguiu gravar o arquivo (Anúncio)!')
+
+    def book(self, titulo, descricao, preco, vendedor, data):
+        new_anuncio = Anuncio(titulo, descricao, preco, vendedor, data)
+        self.__storeanuncios.append(new_anuncio)
+        try:
+            self.__write()
+        except Exception as e:
+            print(f"Erro em salvar anuncios.json: {e}")
+        return new_anuncio
+
+    def setAnuncio(self, titulo, descricao, preco):
+        for anuncio in self.__storeanuncios:
+            if titulo == anuncio.titulo:
+                anuncio.titulo = titulo
+                anuncio.descricao = descricao
+                anuncio.preco = preco
+                print(f'O Anúncio {anuncio.titulo} foi editado com sucesso.')
+                self.__write()
+                return anuncio
+        print('O método setAnuncio foi chamado, porém sem sucesso.')
+        return None
+        
+    def removeAnuncio(self, anuncio):
+        if anuncio in self.__storeanuncios:
+            self.__storeanuncios.remove(anuncio)
+            print(f'O anúncio {anuncio.titulo} foi removido do cadastro.')
+            self.__write()
+            return anuncio
+        print(f'O Anúncio {anuncio.titulo} não foi identificado!')

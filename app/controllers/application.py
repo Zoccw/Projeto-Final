@@ -1,4 +1,5 @@
-from app.controllers.datarecord import UserRecord, MessageRecord
+import datetime
+from app.controllers.datarecord import UserRecord, MessageRecord, AnuncioRecord
 from bottle import template, redirect, request, response, Bottle, static_file
 import socketio
 
@@ -13,10 +14,12 @@ class Application:
             'create': self.create,
             'delete': self.delete,
             'chat': self.chat,
-            'edit': self.edit
+            'edit': self.edit,
+            'anunciar' : self.anunciar,
         }
         self.__users = UserRecord()
         self.__messages = MessageRecord()
+        self.__anuncios = AnuncioRecord()
 
         self.edited = None
         self.removed = None
@@ -85,6 +88,18 @@ class Application:
             password = request.forms.get('password')
             self.insert_user(username, password)
             return self.render('portal')
+        
+        @self.app.route('/anunciar', method='GET')
+        def anunciar_getter():
+            return self.render('anunciar')
+        
+        @self.app.route('/anunciar', method='POST')
+        def anunciar_action():
+            titulo = request.forms.get('titulo')
+            descricao = request.forms.get('descricao')
+            preco = request.forms.get('preco')
+            self.insert_anuncio(titulo, descricao, preco)
+            print("Anúncio adicionado com sucesso.")
 
         @self.app.route('/logout', method='POST')
         def logout_action():
@@ -115,6 +130,13 @@ class Application:
     def getCurrentUserBySessionId(self):
         session_id = request.get_cookie('session_id')
         return self.__users.getCurrentUser(session_id)
+    
+    def anunciar(self):
+        current_user = self.getCurrentUserBySessionId()
+        if current_user:
+            return template('app/views/html/anunciar', transfered=True)
+        return template('app/views/html/anunciar', transfered=False)
+
 
     def create(self):
         return template('app/views/html/create')
@@ -177,6 +199,7 @@ class Application:
 
     def insert_user(self, username, password):
         self.created= self.__users.book(username, password,[])
+        print(f"insert_user: self.created = {self.created}")
         self.update_account_list()
         redirect('/portal')
 
@@ -189,6 +212,14 @@ class Application:
         self.__users.logout(session_id)
         response.delete_cookie('session_id')
         self.update_users_list()
+        
+    def insert_anuncio(self, titulo, descricao, preco):
+            current_user = self.getCurrentUserBySessionId()
+            vendedor = current_user.username
+            data = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+            self.created = self.__anuncios.book(titulo, descricao, preco, vendedor, data)
+            print(f"insert_anuncio: self.created = {self.created}")
+
 
     def chat(self):
         current_user = self.getCurrentUserBySessionId()
