@@ -1,0 +1,33 @@
+.button-container {
+    display: flex; /* Define o contêiner como flexível */
+    gap: 10px; /* Espaçamento entre os botões */
+    margin-top:10px;
+    margin-bottom: 10px;
+}
+.anuncio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.anuncio-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.anuncio-card:hover {
+    background-color: #9b8f8f;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgb(51, 51, 51) 0px 0px 0px 3px;
+}
+
+.anuncio-image {
+    width: 100%;
+    height: 200px;
+    object-fit: fill;
+    border-radius: 4px;
+}
+

@@ -9,7 +9,6 @@
     <script src="/static/js/pagina.js"></script>
 </head>
 <body>
-    % if transfered:
         <h1>Seja bem vindo :)</h1>
         <div>
             <h2>Dados do {{"Super" if current_user.isAdmin() else ""}} Usuário:</h2>
@@ -31,14 +30,10 @@
                 <form action="/admin" method="get">
                     <button type="submit">Administração</button>
                 </form>
+                <form action="/anunciar" method="get">
+                    <button type="submit">Anúncios</button>
+                </form>
             </div>
         </div>
-    % else:
-        <h1>Página reservada!</h1>
-        <h3>Realize seu LOGIN em nosso portal</h3>
-        <form action="/portal" method="get">
-          <button type="submit">Portal</button>
-        </form>
-    % end
 </body>
 </html>

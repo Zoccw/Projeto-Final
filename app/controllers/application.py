@@ -1,8 +1,19 @@
 import datetime
-from app.controllers.datarecord import UserRecord, MessageRecord, AnuncioRecord
-from bottle import template, redirect, request, response, Bottle, static_file
+import uuid
 import socketio
+import os
+from app.controllers.datarecord import UserRecord, MessageRecord, AnuncioRecord
+from bottle import template, redirect, request, response, Bottle, static_file, abort
 
+def login_required(func):
+    def wrapper(*args, **kwargs):
+        app = request.environ.get('application')
+        current_user = app.getCurrentUserBySessionId()
+        if not current_user:
+            redirect('/portal')
+            return
+        return func(*args, **kwargs)
+    return wrapper
 
 class Application:
 
@@ -16,6 +27,8 @@ class Application:
             'chat': self.chat,
             'edit': self.edit,
             'anunciar' : self.anunciar,
+            'anunciarCriar' : self.anunciarCriar,
+            'anunciarRemover' : self.anunciarRemover,
         }
         self.__users = UserRecord()
         self.__messages = MessageRecord()
@@ -39,6 +52,9 @@ class Application:
 
     # estabelecimento das rotas
     def setup_routes(self):
+        
+    # Rotas Users------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
         @self.app.route('/static/<filepath:path>')
         def serve_static(filepath):
             return static_file(filepath, root='./app/static')
@@ -48,10 +64,12 @@ class Application:
             return static_file('favicon.ico', root='.app/static')
 
         @self.app.route('/pagina', method='GET')
+        @login_required
         def pagina_getter():
             return self.render('pagina')
 
         @self.app.route('/chat', method='GET')
+        @login_required
         def chat_getter():
             return self.render('chat')
 
@@ -61,9 +79,10 @@ class Application:
             return self.render('portal')
 
         @self.app.route('/edit', method='GET')
+        @login_required
         def edit_getter():
             return self.render('edit')
-
+        
         @self.app.route('/portal', method='POST')
         def portal_action():
             username = request.forms.get('username')
@@ -71,6 +90,7 @@ class Application:
             self.authenticate_user(username, password)
 
         @self.app.route('/edit', method='POST')
+        @login_required
         def edit_action():
             username = request.forms.get('username')
             password = request.forms.get('password')
@@ -88,32 +108,52 @@ class Application:
             password = request.forms.get('password')
             self.insert_user(username, password)
             return self.render('portal')
-        
-        @self.app.route('/anunciar', method='GET')
-        def anunciar_getter():
-            return self.render('anunciar')
-        
-        @self.app.route('/anunciar', method='POST')
-        def anunciar_action():
-            titulo = request.forms.get('titulo')
-            descricao = request.forms.get('descricao')
-            preco = request.forms.get('preco')
-            self.insert_anuncio(titulo, descricao, preco)
-            print("Anúncio adicionado com sucesso.")
-
+                            
         @self.app.route('/logout', method='POST')
         def logout_action():
             self.logout_user()
             return self.render('portal')
 
         @self.app.route('/delete', method='GET')
+        @login_required
         def delete_getter():
             return self.render('delete')
 
         @self.app.route('/delete', method='POST')
+        @login_required
         def delete_action():
             self.delete_user()
             return self.render('portal')
+        
+    # Rotas Anunciar---------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        @self.app.route('/anunciar', method='GET')
+        @login_required
+        def anunciar_getter():
+            return self.render('anunciar')
+        
+        @self.app.route('/anunciar/remover', method='GET')
+        @login_required
+        def anunciarRemover_getter():
+            return self.render('anunciarRemover')
+        
+        @self.app.route('/anunciar/remover', method= 'POST')
+        @login_required
+        def anunciarRemover_action():
+            id = request.forms.get('id')
+            self.remove_anuncio(id)
+            return self.render('anunciar')
+        
+        @self.app.route('/anunciar/criar', method='GET')
+        @login_required
+        def anunciarCriar_getter():
+            return self.render('anunciarCriar')
+        
+        @self.app.route('/anunciar/criar', method='POST')
+        @login_required
+        def anunciarCriar_action():
+            self.acaoAnununcioCriar()
+            return self.render('anunciar')
 
 
     # método controlador de acesso às páginas:
@@ -124,20 +164,78 @@ class Application:
         return content(parameter)
 
     # métodos controladores de páginas
+    # Métodos Anunciar--------------------------------------------------------------------------------------------------------------
+    def anunciar(self):
+        current_user = self.getCurrentUserBySessionId()
+        anuncios = self.getAnunciosOnUser()
+        if current_user:
+            return template('app/views/html/anunciar', anuncios=anuncios)
+        return template('app/views/html/anunciar')
+    
+    def acaoAnununcioCriar(self):
+        current_user = self.getCurrentUserBySessionId()
+        titulo = request.forms.get('titulo')
+        descricao = request.forms.get('descricao')
+        preco = request.forms.get('preco')
+        imagem = request.files.get('imagem')
+        caminho_imagem = None
+        if current_user:
+            if imagem and imagem.filename:
+                file_extension = os.path.splitext(imagem.filename)[1]
+                unique_filename = (f"file_{datetime.datetime.now().strftime('%d%m%Y_%H%M%S')}{file_extension}")
+                save_dir = "app/static/usersImg"
+                save_path = os.path.join(save_dir, unique_filename)
+                url_path = f'/static/usersImg/{unique_filename}'
+                imagem.save(save_path)
+                caminho_imagem = url_path
+                self.insert_anuncio(titulo, descricao, preco, caminho_imagem)
+            else:
+                self.insert_anuncio(titulo, descricao, preco, caminho_imagem)
+
+    def anunciarCriar(self):
+        anuncios = self.getAnunciosOnUser()
+        return template('app/views/html/anunciarCriar', anuncios=anuncios)
+    
+    def anunciarRemover(self):
+        anuncios = self.getAnunciosOnUser()
+        return template('app/views/html/anunciarRemover', anuncios=anuncios)
+    
+    def remove_anuncio(self, id):
+        self.removed = self.__anuncios.removeAnuncio(id)
+        redirect('/anunciar')
+    
+    def getAnunciosOnUser(self):
+        current_user = self.getCurrentUserBySessionId()
+        anuncios = self.__anuncios.getAnuncios()
+        anuncios_current_user = []
+        if current_user:
+            for anuncio in anuncios:
+                if current_user.username == anuncio.vendedor:
+                    anuncios_current_user.append(anuncio)
+            return anuncios_current_user
+        return None
+    
+    def insert_anuncio(self, titulo, descricao, preco, imagem=None):
+        current_user = self.getCurrentUserBySessionId()
+        if current_user:
+            vendedor = current_user.username
+            data = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+            id = uuid.uuid4()
+            self.created = self.__anuncios.book(titulo, descricao, preco, vendedor, data, imagem, str(id))
+            redirect('/anunciar')
+        redirect('/anunciar')
+    
+# Métodos User--------------------------------------------------------------------------------------------------------------
+
     def getAuthenticatedUsers(self):
         return self.__users.getAuthenticatedUsers()
 
     def getCurrentUserBySessionId(self):
         session_id = request.get_cookie('session_id')
+        if not session_id:
+            return None
         return self.__users.getCurrentUser(session_id)
     
-    def anunciar(self):
-        current_user = self.getCurrentUserBySessionId()
-        if current_user:
-            return template('app/views/html/anunciar', transfered=True)
-        return template('app/views/html/anunciar', transfered=False)
-
-
     def create(self):
         return template('app/views/html/create')
 
@@ -172,8 +270,8 @@ class Application:
         self.update_users_list()
         current_user = self.getCurrentUserBySessionId()
         if current_user:
-            return template('app/views/html/pagina', transfered=True, current_user=current_user)
-        return template('app/views/html/pagina', transfered=False)
+            return template('app/views/html/pagina', current_user=current_user)
+        return template('app/views/html/pagina')
 
     def is_authenticated(self, username):
         current_user = self.getCurrentUserBySessionId()
@@ -184,7 +282,6 @@ class Application:
     def authenticate_user(self, username, password):
         session_id = self.__users.checkUser(username, password)
         if session_id:
-            self.logout_user()
             response.set_cookie('session_id', session_id, httponly=True, secure=True, max_age=3600)
             redirect('/pagina')
         redirect('/portal')
@@ -213,14 +310,6 @@ class Application:
         response.delete_cookie('session_id')
         self.update_users_list()
         
-    def insert_anuncio(self, titulo, descricao, preco):
-            current_user = self.getCurrentUserBySessionId()
-            vendedor = current_user.username
-            data = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
-            self.created = self.__anuncios.book(titulo, descricao, preco, vendedor, data)
-            print(f"insert_anuncio: self.created = {self.created}")
-
-
     def chat(self):
         current_user = self.getCurrentUserBySessionId()
         if current_user:
@@ -238,7 +327,6 @@ class Application:
         except UnicodeEncodeError as e:
             print(f"Encoding error: {e}")
             return "An error occurred while processing the message."
-
 
     # Websocket:
     def setup_websocket_events(self):
@@ -285,6 +373,3 @@ class Application:
     # este método vai comunicar todos os Administradores ativos.
     def update_account_list(self):
         print('Atualizando a lista de usuários cadastrados...')
-        users = self.__users.getUserAccounts()
-        users_list = [{'username': user.username} for user in users]
-        self.sio.emit('update_account_event', {'accounts': users_list})

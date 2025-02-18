@@ -159,18 +159,18 @@ class AnuncioRecord():
                 self.__storeanuncios = [Anuncio(**anuncio) for anuncio in anuncios]
         except FileNotFoundError:
             print('Não existem anúncios registrados')
-            
+
     def __write(self):
         try:
             with open("app/controllers/db/anuncios.json", "w") as fjson:
                 anuncios = [vars(anuncio) for anuncio in self.__storeanuncios]
-                json.dump(anuncios, fjson, indent=4)
+                json.dump(anuncios, fjson, indent=4, ensure_ascii=False)
                 print('Arquivo gravado com sucesso (Anúncio)!')
         except FileNotFoundError:
             print('O sistema não conseguiu gravar o arquivo (Anúncio)!')
 
-    def book(self, titulo, descricao, preco, vendedor, data):
-        new_anuncio = Anuncio(titulo, descricao, preco, vendedor, data)
+    def book(self, titulo, descricao, preco, vendedor, data, imagem, id_anuncio):
+        new_anuncio = Anuncio(titulo, descricao, preco, vendedor, data, imagem, id_anuncio)
         self.__storeanuncios.append(new_anuncio)
         try:
             self.__write()
@@ -190,10 +190,17 @@ class AnuncioRecord():
         print('O método setAnuncio foi chamado, porém sem sucesso.')
         return None
         
-    def removeAnuncio(self, anuncio):
-        if anuncio in self.__storeanuncios:
-            self.__storeanuncios.remove(anuncio)
-            print(f'O anúncio {anuncio.titulo} foi removido do cadastro.')
-            self.__write()
-            return anuncio
-        print(f'O Anúncio {anuncio.titulo} não foi identificado!')
+    def removeAnuncio(self, anuncio_id):
+        for anuncio in self.__storeanuncios:
+            if anuncio_id in anuncio.id_anuncio:
+                self.__storeanuncios.remove(anuncio)
+                print(f'O anúncio {anuncio.titulo} foi removido do cadastro.')
+                self.__write()
+                return anuncio
+            print(f'O Anúncio {anuncio.titulo} não foi identificado!')
+        
+    def getAnuncios(self):
+        return self.__storeanuncios
+    
+        
+    

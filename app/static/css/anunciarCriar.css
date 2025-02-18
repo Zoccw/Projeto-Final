@@ -1,0 +1,23 @@
+.anuncio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.anuncio-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.anuncio-image {
+    width: 100%;
+    height: 200px;
+    object-fit: fill;
+    border-radius: 4px;
+}
+.button-container {
+    display: flex; /* Define o contêiner como flexível */
+    gap: 10px; /* Espaçamento entre os botões */
+}

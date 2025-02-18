@@ -1,16 +1,56 @@
 [
     {
-        "titulo": "asdasda",
-        "descricao": "dasdasd",
-        "preco": "12312414312341",
-        "data": "16-02-2025 23:06",
-        "vendedor": "a"
+        "titulo": "as",
+        "descricao": "as",
+        "preco": "123123",
+        "data": "18-02-2025 12:37",
+        "vendedor": "a",
+        "imagem": "/static/usersImg/file_18022025_123722.jpg",
+        "id_anuncio": "37e117f5-5cb7-4e1c-b5dc-0414f68712a4"
     },
     {
-        "titulo": "asdasda",
-        "descricao": "dasdasd",
-        "preco": "12312414312341",
-        "data": "16-02-2025 23:13",
-        "vendedor": "a"
+        "titulo": "asdasdasdasd",
+        "descricao": "123123123123",
+        "preco": "12312312312",
+        "data": "18-02-2025 14:26",
+        "vendedor": "Henrique",
+        "imagem": "/static/usersImg/file_18022025_142643.jpg",
+        "id_anuncio": "a3a4c65b-fd3e-4476-9fa5-b58af3e034dd"
+    },
+    {
+        "titulo": "asdasdasdasd",
+        "descricao": "123123123123",
+        "preco": "12312312312",
+        "data": "18-02-2025 14:32",
+        "vendedor": "Henrique",
+        "imagem": "/static/usersImg/file_18022025_143212.jpg",
+        "id_anuncio": "8b4a8631-c8ef-4e00-a507-308d317184c8"
+    },
+    {
+        "titulo": "a",
+        "descricao": "a",
+        "preco": "11111111",
+        "data": "18-02-2025 15:02",
+        "vendedor": "a",
+        "imagem": "/static/usersImg/file_18022025_150240.png",
+        "id_anuncio": "fc7d42ba-7b38-40b7-8efc-fa26b0659f16"
+    },
+    {
+        "titulo": "asdasd",
+        "descricao": "asdasdd",
+        "preco": "123123",
+        "data": "18-02-2025 15:04",
+        "vendedor": "a",
+        "imagem": "/static/usersImg/file_18022025_150426.png",
+        "id_anuncio": "4680f1d7-0629-4e15-a025-9c798837da37"
+    },
+    {
+        "titulo": "teste",
+        "descricao": "testando",
+        "preco": "1000",
+        "data": "18-02-2025 17:58",
+        "vendedor": "a",
+        "imagem": "/static/usersImg/file_18022025_175844.jpeg",
+        "id_anuncio": "87a76c14-2da0-46a0-8abd-907f55fbd5ba"
     }
 ]

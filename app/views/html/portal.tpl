@@ -7,14 +7,6 @@
     <title>>.::Portal (Login)::.</title>
     <link rel="stylesheet" type="text/css" href="/static/css/portal.css">
     <script src="/static/js/portal.js"></script>
-</head>
-<body>
-    <div class= "object_centered">
-      <h1>Seja bem-vindo ao BMVCh@t!</h1>
-      <h4>Estrutura desenvolvida para oferecer suporte ao desenvolvimento FullStack da disciplina de Orientação a Objetos (Henrique Moura - 01/2024).</h4>
-      <img src="{{'static/img/BottleLogo.png'}}" alt="Descrição da Imagem"
-         width="300" height="300" onclick="displayText()">
-    </div>
     <h1>Login</h1>
     % if username:
       <div class= "object_centered">
@@ -39,6 +31,7 @@
         % elif created is not None:
             <h4>O usuário {{ created }} foi criado neste cadastro.</h4>
         % end
+        <h4>Para acessar a área de mensagens e outras funcionalidades, faça login.</h4>
         <div class= "object_centered">
           <form action="/portal" method="post">
               <label for="username">Nome:</label>

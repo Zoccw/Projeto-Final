@@ -3,34 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico" />
-    <title>Criar Anúncio</title>
+    <link rel="stylesheet" href="/static/css/anunciar.css">
+    <title>Seus Anúncios</title>
 </head>
 <body>
-    % if transfered:
-        <h1>Seja bem-vindo ao BMVC! (Bottle Powered)</h1>
-        <h4>Cadastre o seu anúncio:</h4>
-            <form action="/anunciar" method="post">
-            <label for="titulo">Título:</label>
-            <input id="titulo" name="titulo" type="text" required /><br>
-            <label for="descricao">Descrição:</label>
-            <input id="descricao" name="descricao" type="text" /><br>
-            <label for="preco">Preço:</label>
-            <input id="preco" name="preco" type="number" /><br>
-            </br>
-            <div class= "button-container">
-                <input value="Criar" type="submit" />
-            </div>
+        <h1>Seus Anúncios:</h1>
+        <div class= "button-container">
+            <form action="/pagina" method="get">
+                <button type="submit">Página Principal</button>
             </form>
-            <form action="/portal" method="post">
-            <button type="submit">Portal</button>
+        </div>
+        <div class= "button-container">
+            <form action="/anunciar/criar" method="get">
+                <button type="submit">Criar Anúncios</button>
             </form>
-    % else:
-        <h1>Página reservada!</h1>
-        <h3>Realize seu LOGIN em nosso portal</h3>
-        <form action="/portal" method="get">
-          <button type="submit">Portal</button>
-        </form>
-    % end
+            <form action="/anunciar/remover" method="get">
+                <button type="submit">Remover Anúncios</button>
+            </form>
+        </div>
+        <div class="anuncio-grid">
+            % if anuncios:
+                % for anuncio in anuncios:
+                    <div class="anuncio-card">
+                        % if anuncio.imagem:
+                            <img 
+                                class="anuncio-image"
+                                src="{{ anuncio.imagem }}"
+                                alt="{{ anuncio.titulo }}"
+                                onerror="this.onerror=null; this.src='/static/img/default.png';"
+                            />
+                        % end
+                        <h3>{{ anuncio.titulo }}</h3>
+                        <p>{{ anuncio.descricao }}</p>
+                        <p>Preço: R$ {{ anuncio.preco }}</p>
+                        <p>Vendedor: {{ anuncio.vendedor }}</p>
+                        <p>Data: {{ anuncio.data }}</p>
+                    </div>
+                % end
+            % else:
+                <p>Você tem nenhum anúncio cadastrado.</p>
+            % end
+        </div>
 </body>
 </html>
